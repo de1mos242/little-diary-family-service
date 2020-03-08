@@ -1,0 +1,8 @@
+aiohttp
+PyYAML
+sqlalchemy
+alembic
+aiopg
+python-dotenv
+aiohttp-apispec
+marshmallow
