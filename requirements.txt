@@ -1,8 +1,10 @@
 aiohttp
-PyYAML
-sqlalchemy
-alembic
-aiopg
-python-dotenv
 aiohttp-apispec
+aiohttp_jwt
+aiopg
+alembic
+cryptography
 marshmallow
+PyYAML
+python-dotenv
+sqlalchemy
