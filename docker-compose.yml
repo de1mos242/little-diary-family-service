@@ -1,4 +1,3 @@
-# WARNING: this file is not suitable for production, please use with caution
 version: '3'
 
 services:
