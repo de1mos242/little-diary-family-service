@@ -40,8 +40,12 @@ async def close_pg(app):
     await app['db'].wait_closed()
 
 
-if __name__ == '__main__':
+def main():
     loop = asyncio.get_event_loop()
     app = loop.run_until_complete(init_app())
     app.on_cleanup.append(close_pg)
     web.run_app(app)
+
+
+if __name__ == '__main__':
+    main()
