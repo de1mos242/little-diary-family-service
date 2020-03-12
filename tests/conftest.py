@@ -2,8 +2,11 @@ from uuid import UUID
 
 import jwt
 import pytest
+from pytest_factoryboy import register
 
+from family_api import models
 from family_api.main import init_app
+from tests.factories import FamilyFactory, FamilyMemberFactory, BabyFactory
 
 TEST_JWT_PRIVATE_KEY = """
 -----BEGIN RSA PRIVATE KEY-----
@@ -38,7 +41,16 @@ hbwW5wUt+W//6qhcVtQj+0EHJfPT7VPQjzTFd0rBx0YLf0FX5SsOFyo=
 
 @pytest.fixture
 async def app():
-    return await init_app()
+    app = await init_app()
+    exclude_tables = ["alembic_version"]
+
+    meta = models.meta
+    async with app['db'].acquire() as conn:
+        for table in reversed(meta.sorted_tables):
+            if table.name not in exclude_tables:
+                await conn.execute(table.delete())
+
+    return app
 
 
 @pytest.fixture
@@ -58,3 +70,8 @@ def make_headers():
         }
 
     return _make_headers
+
+
+register(FamilyFactory)
+register(FamilyMemberFactory)
+register(BabyFactory)

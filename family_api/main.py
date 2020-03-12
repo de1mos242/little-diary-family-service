@@ -6,6 +6,7 @@ from aiohttp_jwt import JWTMiddleware
 from aiopg.sa import create_engine
 
 from family_api.config import Config
+from family_api.middlewares import current_user_middleware
 from family_api.routes import setup_routes
 
 
@@ -22,7 +23,7 @@ def create_jwt_middleware():
 
 async def init_app():
     jwt_middleware = create_jwt_middleware()
-    app = web.Application(middlewares=[jwt_middleware])
+    app = web.Application(middlewares=[jwt_middleware, current_user_middleware])
     setup_routes(app)
     setup_aiohttp_apispec(app=app, title="Family service", version="v1", swagger_path='/swagger-ui',
                           securityDefinitions={"jwt": {"type": "apiKey",
@@ -32,6 +33,7 @@ async def init_app():
                                                        "in": "header"}},
                           security=[{"jwt": []}])
     app['db'] = await create_db_connection()
+    app.on_cleanup.append(close_pg)
     return app
 
 
@@ -43,7 +45,6 @@ async def close_pg(app):
 def main():
     loop = asyncio.get_event_loop()
     app = loop.run_until_complete(init_app())
-    app.on_cleanup.append(close_pg)
     web.run_app(app)
 
 

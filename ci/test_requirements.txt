@@ -1,4 +1,5 @@
 pytest
 pytest-aiohttp
+pytest-factoryboy
 pytest-html
 pylint

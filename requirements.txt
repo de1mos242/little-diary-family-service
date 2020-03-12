@@ -4,6 +4,7 @@ aiohttp_jwt
 aiopg
 alembic
 cryptography
+factory-boy
 marshmallow
 PyYAML
 python-dotenv
