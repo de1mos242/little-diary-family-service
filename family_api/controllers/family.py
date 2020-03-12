@@ -1,7 +1,7 @@
-from family_api.models import family
+from family_api.repositories.family_repository import insert_family, get_by_id
 
 
 async def register_family(family_obj, conn):
-    family_id = await conn.scalar(family.insert().values(family_obj))
-    stored_family = await (await conn.execute(family.select().where(family.c.id == family_id))).first()
+    family_id = await insert_family(family_obj, conn)
+    stored_family = await get_by_id(family_id, conn)
     return stored_family

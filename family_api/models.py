@@ -1,24 +1,26 @@
-from sqlalchemy import MetaData, Table, Integer, Column, Text, DateTime, ForeignKey
+from sqlalchemy import MetaData, Table, Integer, Column, Text, DateTime, ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 
 meta = MetaData()
 
-family = Table(
+families_table = Table(
     'family', meta,
 
     Column('id', Integer, primary_key=True),
     Column('title', Text, nullable=False)
 )
 
-family_member = Table(
+family_members_table = Table(
     'family_member', meta,
 
     Column('id', Integer, primary_key=True),
     Column('user_uuid', UUID, unique=True, nullable=False),
-    Column('family_id', Integer, ForeignKey('family.id', ondelete='CASCADE'), index=True)
+    Column('family_id', Integer, ForeignKey('family.id', ondelete='CASCADE')),
+
+    UniqueConstraint('family_id', 'user_uuid', name="family_member_family_id_user_uuid_uidx")
 )
 
-baby = Table(
+babies_table = Table(
     'baby', meta,
 
     Column('id', Integer, primary_key=True),
