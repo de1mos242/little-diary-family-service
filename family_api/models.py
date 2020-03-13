@@ -1,5 +1,7 @@
-from sqlalchemy import MetaData, Table, Integer, Column, Text, DateTime, ForeignKey, UniqueConstraint
+from sqlalchemy import MetaData, Table, Integer, Column, Text, DateTime, ForeignKey, UniqueConstraint, Enum
 from sqlalchemy.dialects.postgresql import UUID
+
+from family_api.enums import TokenType
 
 meta = MetaData()
 
@@ -28,4 +30,13 @@ babies_table = Table(
     Column('first_name', Text, nullable=False),
     Column('date_of_birth', DateTime),
     Column('family_id', Integer, ForeignKey('family.id', ondelete='CASCADE'), index=True)
+)
+
+issued_tokens_table = Table(
+    'issued_token', meta,
+
+    Column('id', Integer, primary_key=True),
+    Column('token_type', Enum(TokenType), nullable=False),
+    Column('token', Text, nullable=False, unique=True),
+    Column('expired_at', DateTime, nullable=False)
 )
