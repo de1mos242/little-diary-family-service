@@ -50,7 +50,10 @@ async def app():
             if table.name not in exclude_tables:
                 await conn.execute(table.delete())
 
-    return app
+    yield app
+
+    await app.shutdown()
+    await app.cleanup()
 
 
 @pytest.fixture
