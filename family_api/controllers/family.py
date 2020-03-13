@@ -22,3 +22,7 @@ async def get_family_info(family_id: int, conn):
 
 async def update_family(family_id: int, family_data, conn):
     return await family_repository.update_family(family_id, family_data, conn)
+
+
+async def delete_family(family_id: int, conn):
+    return await family_repository.delete_family(family_id, conn)

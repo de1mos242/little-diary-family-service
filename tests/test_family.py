@@ -60,7 +60,7 @@ async def test_get_family_info(app: web.Application, cli: TestClient, make_heade
     assert response['babies'][0]['date_of_birth'] == baby['date_of_birth'].strftime("%Y-%m-%dT%H:%M:%S.%f")
 
 
-async def test_rename_family(app: web.Application, cli: TestClient, make_headers, family_factory,
+async def test_update_family(app: web.Application, cli: TestClient, make_headers, family_factory,
                              family_member_factory):
     user_uuid = str(uuid4())
     async with app['db'].acquire() as conn:
@@ -86,3 +86,27 @@ async def test_rename_family(app: web.Application, cli: TestClient, make_headers
     assert stored_family is not None
     assert stored_family.id == family['id']
     assert stored_family.title == "My super family"
+
+
+async def test_delete_family(app: web.Application, cli: TestClient, make_headers, family_factory,
+                             family_member_factory):
+    user_uuid = str(uuid4())
+    async with app['db'].acquire() as conn:
+        family = family_factory.create()
+        family['id'] = await family_repository.insert_family(family, conn)
+        another_family = family_factory.create()
+        another_family['id'] = await family_repository.insert_family(another_family, conn)
+        family_member = family_member_factory.create(family_id=family['id'], user_uuid=user_uuid)
+        family_member['id'] = await family_member_repository.insert_family_member(family_member, conn)
+
+    resp = await cli.delete(f"/v1/family/{another_family['id']}",
+                            headers=make_headers(user_uuid))
+    assert resp.status == 403, await resp.text()
+
+    resp = await cli.delete(f"/v1/family/{family['id']}",
+                            headers=make_headers(user_uuid))
+    assert resp.status == 204, await resp.text()
+
+    async with app['db'].acquire() as conn:
+        stored_family = await family_repository.get_by_id(family['id'], conn)
+    assert stored_family is None
