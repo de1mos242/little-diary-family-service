@@ -1,4 +1,5 @@
-pytest
-pytest-aiohttp
-pytest-html
-pylint
+pytest~=5.3.5
+pytest-aiohttp~=0.3.0
+pytest-factoryboy~=2.0.3
+pytest-html~=2.1.0
+pylint~=2.4.4
