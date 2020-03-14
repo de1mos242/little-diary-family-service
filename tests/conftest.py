@@ -6,7 +6,7 @@ from pytest_factoryboy import register
 
 from family_api import models
 from family_api.main import init_app
-from tests.factories import FamilyFactory, FamilyMemberFactory, BabyFactory
+from tests.factories import FamilyFactory, FamilyMemberFactory, BabyFactory, IssuedTokenFactory
 
 TEST_JWT_PRIVATE_KEY = """
 -----BEGIN RSA PRIVATE KEY-----
@@ -78,3 +78,4 @@ def make_headers():
 register(FamilyFactory)
 register(FamilyMemberFactory)
 register(BabyFactory)
+register(IssuedTokenFactory)

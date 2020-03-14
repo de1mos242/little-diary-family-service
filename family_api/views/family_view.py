@@ -30,7 +30,7 @@ class FamilyView(web.View):
     @is_current_user_in_family
     async def get(self):
         schema = FamilySchema()
-        family_id = self.request.match_info['family_id']
+        family_id = int(self.request.match_info['family_id'])
         async with self.request.app['db'].acquire() as conn:
             family = await get_family_info(family_id, conn)
         return web.json_response(schema.dump(family))
@@ -41,7 +41,7 @@ class FamilyView(web.View):
     @is_current_user_in_family
     async def put(self):
         schema = FamilySchema()
-        family_id = self.request.match_info['family_id']
+        family_id = int(self.request.match_info['family_id'])
         family_obj = schema.load(await self.request.json())
         async with self.request.app['db'].acquire() as conn:
             await update_family(family_id, family_obj, conn)
@@ -51,7 +51,7 @@ class FamilyView(web.View):
           responses={204: "Successfully deleted"})
     @is_current_user_in_family
     async def delete(self):
-        family_id = self.request.match_info['family_id']
+        family_id = int(self.request.match_info['family_id'])
         async with self.request.app['db'].acquire() as conn:
             await delete_family(family_id, conn)
         return web.Response(status=204)
