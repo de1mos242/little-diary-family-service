@@ -36,3 +36,12 @@ async def issue_invitation_token(family_id, conn):
                         related_entity_id=family_id)
     token_id = await issued_token_repository.insert_token(issued_token, conn)
     return await issued_token_repository.get_by_id(token_id, conn)
+
+
+async def remove_family_member(family_id: int, member_id: int, conn):
+    member = await family_member_repository.get_by_id(member_id, conn)
+    if not member:
+        raise HTTPNotFound(text="Family member not found")
+    if member['family_id'] != family_id:
+        raise HTTPBadRequest(text="Member and family mismatch")
+    await family_member_repository.delete(member_id, conn)

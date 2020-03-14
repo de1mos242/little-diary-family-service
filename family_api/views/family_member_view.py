@@ -1,7 +1,7 @@
 from aiohttp import web
 from aiohttp_apispec import request_schema, docs, response_schema
 
-from family_api.controllers.family_member import accept_member_invitation, issue_invitation_token
+from family_api.controllers.family_member import accept_member_invitation, issue_invitation_token, remove_family_member
 from family_api.schemas import TokenSchema
 
 
@@ -28,3 +28,14 @@ class FamilyMemberTokenView(web.View):
         async with self.request.app['db'].acquire() as conn:
             token = await issue_invitation_token(family_id, conn)
         return web.json_response(schema.dump(token))
+
+
+class FamilyMemberView(web.View):
+    @docs(summary="Remove family member",
+          responses={204: "Successfully deleted"})
+    async def delete(self):
+        family_id = int(self.request.match_info['family_id'])
+        member_id = int(self.request.match_info['member_id'])
+        async with self.request.app['db'].acquire() as conn:
+            await remove_family_member(family_id, member_id, conn)
+        return web.Response(status=204)

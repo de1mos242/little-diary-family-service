@@ -55,3 +55,25 @@ async def test_create_invitation_token(app: web.Application, cli: TestClient, ma
     assert issued_token is not None
     assert issued_token['expired_at'] > datetime.now()
     assert issued_token['token_type'] == TokenType.MEMBER_INVITATION
+
+
+async def test_delete_family_member(app: web.Application, cli: TestClient, make_headers, family_factory,
+                                    family_member_factory):
+    user_uuid = str(uuid4())
+    async with app['db'].acquire() as conn:
+        family = family_factory.create()
+        family['id'] = await family_repository.insert_family(family, conn)
+        family_member = family_member_factory.create(family_id=family['id'], user_uuid=user_uuid)
+        family_member['id'] = await family_member_repository.insert_family_member(family_member, conn)
+        family_other_member = family_member_factory.create(family_id=family['id'], user_uuid=str(uuid4()))
+        family_other_member['id'] = await family_member_repository.insert_family_member(family_other_member, conn)
+
+    resp = await cli.delete(f"/v1/family/{family['id']}/member/{family_other_member['id']}",
+                            headers=make_headers(user_uuid))
+    assert resp.status == 204, await resp.text()
+
+    async with app['db'].acquire() as conn:
+        family_members = await family_member_repository.find_by_family_id(family['id'], conn)
+
+    assert len(family_members) == 1
+    assert family_members[0]['user_uuid'] == user_uuid
