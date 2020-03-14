@@ -57,7 +57,7 @@ async def test_get_family_info(app: web.Application, cli: TestClient, make_heade
     assert len(response['babies']) == 1
     assert response['babies'][0]['uuid'] == baby['baby_uuid']
     assert response['babies'][0]['first_name'] == baby['first_name']
-    assert response['babies'][0]['date_of_birth'] == baby['date_of_birth'].strftime("%Y-%m-%dT%H:%M:%S.%f")
+    assert response['babies'][0]['date_of_birth'] == baby['date_of_birth'].strftime("%Y-%m-%d")
 
 
 async def test_update_family(app: web.Application, cli: TestClient, make_headers, family_factory,

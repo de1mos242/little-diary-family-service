@@ -33,14 +33,9 @@ async def test_accept_invitation(app: web.Application, cli: TestClient, make_hea
     assert family_members[0]['user_uuid'] == user_uuid
 
 
-async def test_create_invitation_token(app: web.Application, cli: TestClient, make_headers, family_factory,
-                                       family_member_factory):
-    user_uuid = str(uuid4())
-    async with app['db'].acquire() as conn:
-        family = family_factory.create()
-        family['id'] = await family_repository.insert_family(family, conn)
-        family_member = family_member_factory.create(family_id=family['id'], user_uuid=user_uuid)
-        family_member['id'] = await family_member_repository.insert_family_member(family_member, conn)
+async def test_create_invitation_token(app: web.Application, cli: TestClient, make_headers,
+                                       add_default_family_with_member):
+    user_uuid, family, _ = add_default_family_with_member
 
     resp = await cli.post(f"/v1/family/{family['id']}/member/token",
                           headers=make_headers(user_uuid))
@@ -57,14 +52,10 @@ async def test_create_invitation_token(app: web.Application, cli: TestClient, ma
     assert issued_token['token_type'] == TokenType.MEMBER_INVITATION
 
 
-async def test_delete_family_member(app: web.Application, cli: TestClient, make_headers, family_factory,
-                                    family_member_factory):
-    user_uuid = str(uuid4())
+async def test_delete_family_member(app: web.Application, cli: TestClient, make_headers, family_member_factory,
+                                    add_default_family_with_member):
+    user_uuid, family, _ = add_default_family_with_member
     async with app['db'].acquire() as conn:
-        family = family_factory.create()
-        family['id'] = await family_repository.insert_family(family, conn)
-        family_member = family_member_factory.create(family_id=family['id'], user_uuid=user_uuid)
-        family_member['id'] = await family_member_repository.insert_family_member(family_member, conn)
         family_other_member = family_member_factory.create(family_id=family['id'], user_uuid=str(uuid4()))
         family_other_member['id'] = await family_member_repository.insert_family_member(family_other_member, conn)
 

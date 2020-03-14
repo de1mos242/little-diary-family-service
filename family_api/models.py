@@ -1,4 +1,4 @@
-from sqlalchemy import MetaData, Table, Integer, Column, Text, DateTime, ForeignKey, UniqueConstraint, Enum
+from sqlalchemy import MetaData, Table, Integer, Column, Text, DateTime, ForeignKey, UniqueConstraint, Enum, Date
 from sqlalchemy.dialects.postgresql import UUID
 
 from family_api.enums import TokenType
@@ -28,7 +28,7 @@ babies_table = Table(
     Column('id', Integer, primary_key=True),
     Column('baby_uuid', UUID, unique=True, nullable=False),
     Column('first_name', Text, nullable=False),
-    Column('date_of_birth', DateTime),
+    Column('date_of_birth', Date),
     Column('family_id', Integer, ForeignKey('family.id', ondelete='CASCADE'), index=True)
 )
 

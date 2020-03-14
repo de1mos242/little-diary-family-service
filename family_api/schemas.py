@@ -4,7 +4,7 @@ from marshmallow import Schema, fields
 class BabySchema(Schema):
     baby_uuid = fields.UUID(dump_only=True, data_key='uuid')
     first_name = fields.Str(required=True)
-    date_of_birth = fields.DateTime()
+    date_of_birth = fields.Date()
 
 
 class FamilyMemberSchema(Schema):
