@@ -38,5 +38,6 @@ issued_tokens_table = Table(
     Column('id', Integer, primary_key=True),
     Column('token_type', Enum(TokenType), nullable=False),
     Column('token', Text, nullable=False, unique=True),
-    Column('expired_at', DateTime, nullable=False)
+    Column('expired_at', DateTime, nullable=False),
+    Column('related_entity_id', Integer, nullable=False)
 )

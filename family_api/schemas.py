@@ -20,5 +20,5 @@ class FamilySchema(Schema):
     members = fields.Nested(FamilyMemberSchema, many=True, dump_only=True)
 
 
-class IssuedTokenSchema(Schema):
+class TokenSchema(Schema):
     token = fields.Str(required=True, allow_none=False)

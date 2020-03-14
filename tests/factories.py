@@ -38,3 +38,4 @@ class IssuedTokenFactory(factory.Factory):
     token_type = TokenType.MEMBER_INVITATION
     token = factory.LazyFunction(lambda: str(uuid4()))
     expired_at = factory.LazyFunction(lambda: datetime.now() + timedelta(days=1))
+    related_entity_id = factory.Sequence(lambda n: n)
