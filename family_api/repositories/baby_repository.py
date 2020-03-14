@@ -14,3 +14,11 @@ async def get_by_id(baby_id, conn) -> dict:
 async def find_by_family_id(family_id, conn) -> List[dict]:
     select_query = babies_table.select().where(babies_table.c.family_id == family_id)
     return [row async for row in conn.execute(select_query)]
+
+
+async def get_by_uuid(baby_uuid: str, conn) -> dict:
+    return await(await conn.execute(babies_table.select().where(babies_table.c.baby_uuid == baby_uuid))).first()
+
+
+async def update_baby(baby_id: int, baby: dict, conn):
+    return await conn.execute(babies_table.update().values(baby).where(babies_table.c.id == baby_id))
