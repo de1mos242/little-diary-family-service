@@ -22,3 +22,7 @@ async def get_by_uuid(baby_uuid: str, conn) -> dict:
 
 async def update_baby(baby_id: int, baby: dict, conn):
     return await conn.execute(babies_table.update().values(baby).where(babies_table.c.id == baby_id))
+
+
+async def delete_baby(baby_id: int, conn):
+    return await conn.execute(babies_table.delete().where(babies_table.c.id == baby_id))

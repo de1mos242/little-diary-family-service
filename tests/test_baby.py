@@ -56,3 +56,18 @@ async def test_update_baby(app: web.Application, cli: TestClient, make_headers, 
     assert babies[0]['baby_uuid'] == baby['baby_uuid']
     assert babies[0]['first_name'] == data['first_name']
     assert babies[0]['date_of_birth'].strftime("%Y-%m-%d") == data['date_of_birth']
+
+
+async def test_delete_baby(app: web.Application, cli: TestClient, make_headers, baby_factory,
+                           add_default_family_with_member):
+    user_uuid, family, _ = add_default_family_with_member
+    async with app['db'].acquire() as conn:
+        baby = baby_factory.create(family_id=family['id'])
+        baby['id'] = await baby_repository.insert_baby(baby, conn)
+
+    resp = await cli.delete(f"/v1/family/{family['id']}/baby/{baby['baby_uuid']}",
+                            headers=make_headers(user_uuid))
+    assert resp.status == 204, await resp.text()
+    async with app['db'].acquire() as conn:
+        babies = await baby_repository.find_by_family_id(family['id'], conn)
+    assert len(babies) == 0
