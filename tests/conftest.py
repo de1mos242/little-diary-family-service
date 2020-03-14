@@ -1,11 +1,13 @@
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import jwt
 import pytest
+from aiohttp import web
 from pytest_factoryboy import register
 
 from family_api import models
 from family_api.main import init_app
+from family_api.repositories import family_repository, family_member_repository
 from tests.factories import FamilyFactory, FamilyMemberFactory, BabyFactory, IssuedTokenFactory
 
 TEST_JWT_PRIVATE_KEY = """
@@ -37,6 +39,11 @@ k6jvXAMgb23vIgXuFR55fEl4O5EH7JWqMxl2xx0mQ8eQwo/G5uZiaS9ZT5xTLTJ+
 hbwW5wUt+W//6qhcVtQj+0EHJfPT7VPQjzTFd0rBx0YLf0FX5SsOFyo=
 -----END RSA PRIVATE KEY-----
 """
+
+register(FamilyFactory)
+register(FamilyMemberFactory)
+register(BabyFactory)
+register(IssuedTokenFactory)
 
 
 @pytest.fixture
@@ -75,7 +82,13 @@ def make_headers():
     return _make_headers
 
 
-register(FamilyFactory)
-register(FamilyMemberFactory)
-register(BabyFactory)
-register(IssuedTokenFactory)
+@pytest.fixture
+async def add_default_family_with_member(app: web.Application, family_factory, family_member_factory):
+    user_uuid = str(uuid4())
+    async with app['db'].acquire() as conn:
+        family = family_factory.create()
+        family['id'] = await family_repository.insert_family(family, conn)
+        family_member = family_member_factory.create(family_id=family['id'], user_uuid=user_uuid)
+        family_member['id'] = await family_member_repository.insert_family_member(family_member, conn)
+
+    return user_uuid, family, family_member
