@@ -3,7 +3,7 @@ from aiohttp_apispec import docs, request_schema, response_schema
 
 from family_api.controllers.family import get_family_info, delete_family, \
     create_or_update_family
-from family_api.decorators import is_current_user_in_family_or_new
+from family_api.decorators import is_current_user_in_family_or_new, is_current_user_in_family
 from family_api.schemas import FamilySchema
 
 
@@ -11,7 +11,7 @@ class FamilyView(web.View):
 
     @docs(summary="Get family info")
     @response_schema(FamilySchema())
-    @is_current_user_in_family_or_new
+    @is_current_user_in_family
     async def get(self):
         schema = FamilySchema()
         family_uuid = self.request.match_info['family_uuid']
@@ -34,7 +34,7 @@ class FamilyView(web.View):
 
     @docs(summary="Delete family",
           responses={204: "Successfully deleted"})
-    @is_current_user_in_family_or_new
+    @is_current_user_in_family
     async def delete(self):
         family_uuid = self.request.match_info['family_uuid']
         async with self.request.app['db'].acquire() as conn:
