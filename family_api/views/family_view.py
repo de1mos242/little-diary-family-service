@@ -1,57 +1,42 @@
-from uuid import UUID
-
 from aiohttp import web
 from aiohttp_apispec import docs, request_schema, response_schema
 
-from family_api.controllers.family import register_family, get_family_info, update_family, delete_family
-from family_api.controllers.family_member import add_family_member
-from family_api.decorators import is_current_user_in_family
+from family_api.controllers.family import get_family_info, delete_family, \
+    create_or_update_family
+from family_api.decorators import is_current_user_in_family_or_new
 from family_api.schemas import FamilySchema
-
-
-class FamilyListView(web.View):
-
-    @docs(summary="Register new family")
-    @request_schema(FamilySchema())
-    @response_schema(FamilySchema())
-    async def post(self):
-        schema = FamilySchema()
-        family_obj = schema.load(await self.request.json())
-        async with self.request.app['db'].acquire() as conn:
-            stored_family = await register_family(family_obj, conn)
-            await add_family_member(stored_family, UUID(self.request['token_data']['user_claims']['uuid']), conn)
-        return web.json_response(schema.dump(stored_family))
 
 
 class FamilyView(web.View):
 
     @docs(summary="Get family info")
     @response_schema(FamilySchema())
-    @is_current_user_in_family
+    @is_current_user_in_family_or_new
     async def get(self):
         schema = FamilySchema()
-        family_id = int(self.request.match_info['family_id'])
+        family_uuid = self.request.match_info['family_uuid']
         async with self.request.app['db'].acquire() as conn:
-            family = await get_family_info(family_id, conn)
+            family = await get_family_info(family_uuid, conn)
         return web.json_response(schema.dump(family))
 
     @docs(summary="Update family info",
-          responses={204: "Successfully updated"})
+          responses={200: "Successfully updated",
+                     201: "Successfully created"})
     @request_schema(FamilySchema())
-    @is_current_user_in_family
+    @is_current_user_in_family_or_new
     async def put(self):
         schema = FamilySchema()
-        family_id = int(self.request.match_info['family_id'])
+        family_uuid = self.request.match_info['family_uuid']
         family_obj = schema.load(await self.request.json())
         async with self.request.app['db'].acquire() as conn:
-            await update_family(family_id, family_obj, conn)
-        return web.Response(status=204)
+            stored_family, created = await create_or_update_family(family_uuid, family_obj, conn)
+        return web.json_response(schema.dump(stored_family), status=201 if created else 200)
 
     @docs(summary="Delete family",
           responses={204: "Successfully deleted"})
-    @is_current_user_in_family
+    @is_current_user_in_family_or_new
     async def delete(self):
-        family_id = int(self.request.match_info['family_id'])
+        family_uuid = self.request.match_info['family_uuid']
         async with self.request.app['db'].acquire() as conn:
-            await delete_family(family_id, conn)
+            await delete_family(family_uuid, conn)
         return web.Response(status=204)

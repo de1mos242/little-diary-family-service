@@ -1,13 +1,13 @@
-from family_api.views.baby_view import BabyListView, BabyView
+from family_api.views.baby_view import BabyView
 from family_api.views.family_member_view import FamilyMemberListView, FamilyMemberTokenView, FamilyMemberView
-from family_api.views.family_view import FamilyListView, FamilyView
+from family_api.views.family_view import FamilyView
 
 
 def setup_routes(app):
-    app.router.add_view('/v1/family', FamilyListView)
-    app.router.add_view(r'/v1/family/{family_id:\d+}', FamilyView)
-    app.router.add_view(r'/v1/family/{family_id:\d+}/member', FamilyMemberListView)
-    app.router.add_view(r'/v1/family/{family_id:\d+}/member/token', FamilyMemberTokenView)
-    app.router.add_view(r'/v1/family/{family_id:\d+}/member/{member_id:\d+}', FamilyMemberView)
-    app.router.add_view(r'/v1/family/{family_id:\d+}/baby', BabyListView)
-    app.router.add_view(r'/v1/family/{family_id:\d+}/baby/{baby_uuid}', BabyView)
+    uuid_regexp = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+    app.router.add_view(f'/v1/family/{{family_uuid:{uuid_regexp}}}', FamilyView)
+    app.router.add_view(f'/v1/family/{{family_uuid:{uuid_regexp}}}/member', FamilyMemberListView)
+    app.router.add_view(f'/v1/family/{{family_uuid:{uuid_regexp}}}/member/token', FamilyMemberTokenView)
+    app.router.add_view(f'/v1/family/{{family_uuid:{uuid_regexp}}}/member/{{member_uuid:{uuid_regexp}}}',
+                        FamilyMemberView)
+    app.router.add_view(f'/v1/family/{{family_uuid:{uuid_regexp}}}/baby/{{baby_uuid:{uuid_regexp}}}', BabyView)

@@ -15,3 +15,8 @@ async def delete_family(family_id, conn):
 
 async def get_by_id(family_id, conn):
     return await (await conn.execute(families_table.select().where(families_table.c.id == family_id))).first()
+
+
+async def get_by_uuid(family_uuid, conn):
+    query = families_table.select().where(families_table.c.family_uuid == family_uuid)
+    return await (await conn.execute(query)).first()
