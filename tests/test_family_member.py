@@ -18,9 +18,9 @@ async def test_accept_invitation(app: web.Application, cli: TestClient, make_hea
         issued_token = issued_token_factory.create(related_entity_id=family['id'])
         issued_token['id'] = await issued_token_repository.insert_token(issued_token, conn)
 
-    resp = await cli.post(f"/v1/family/{family['id']}/member",
-                          data=json.dumps({'token': issued_token['token']}),
-                          headers=make_headers(user_uuid))
+    resp = await cli.put(f"/v1/family/{family['family_uuid']}/member",
+                         data=json.dumps({'token': issued_token['token']}),
+                         headers=make_headers(user_uuid))
     assert resp.status == 204, await resp.text()
 
     async with app['db'].acquire() as conn:
@@ -34,10 +34,10 @@ async def test_accept_invitation(app: web.Application, cli: TestClient, make_hea
 
 
 async def test_create_invitation_token(app: web.Application, cli: TestClient, make_headers,
-                                       add_default_family_with_member):
-    user_uuid, family, _ = add_default_family_with_member
+                                       default_family_with_member):
+    user_uuid, family, _ = default_family_with_member
 
-    resp = await cli.post(f"/v1/family/{family['id']}/member/token",
+    resp = await cli.post(f"/v1/family/{family['family_uuid']}/member/token",
                           headers=make_headers(user_uuid))
     assert resp.status == 200, await resp.text()
     response = await resp.json()
@@ -53,13 +53,13 @@ async def test_create_invitation_token(app: web.Application, cli: TestClient, ma
 
 
 async def test_delete_family_member(app: web.Application, cli: TestClient, make_headers, family_member_factory,
-                                    add_default_family_with_member):
-    user_uuid, family, _ = add_default_family_with_member
+                                    default_family_with_member):
+    user_uuid, family, _ = default_family_with_member
     async with app['db'].acquire() as conn:
         family_other_member = family_member_factory.create(family_id=family['id'], user_uuid=str(uuid4()))
         family_other_member['id'] = await family_member_repository.insert_family_member(family_other_member, conn)
 
-    resp = await cli.delete(f"/v1/family/{family['id']}/member/{family_other_member['id']}",
+    resp = await cli.delete(f"/v1/family/{family['family_uuid']}/member/{family_other_member['member_uuid']}",
                             headers=make_headers(user_uuid))
     assert resp.status == 204, await resp.text()
 

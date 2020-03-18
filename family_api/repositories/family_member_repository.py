@@ -25,5 +25,10 @@ async def get_by_id(member_id: int, conn) -> dict:
     return await (await conn.execute(query)).first()
 
 
+async def get_by_uuid(member_uuid: str, conn) -> dict:
+    query = family_members_table.select().where(family_members_table.c.member_uuid == member_uuid)
+    return await (await conn.execute(query)).first()
+
+
 async def delete(member_id: int, conn):
     await conn.execute(family_members_table.delete().where(family_members_table.c.id == member_id))

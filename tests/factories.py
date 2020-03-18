@@ -10,6 +10,7 @@ class FamilyFactory(factory.Factory):
     class Meta:
         model = dict
 
+    family_uuid = factory.LazyFunction(lambda: str(uuid4()))
     title = factory.Sequence(lambda n: f'Family title {n}')
 
 
@@ -18,6 +19,7 @@ class FamilyMemberFactory(factory.Factory):
         model = dict
 
     user_uuid = factory.LazyFunction(lambda: str(uuid4()))
+    member_uuid = factory.LazyFunction(lambda: str(uuid4()))
     family_id = factory.Sequence(lambda n: n)
 
 

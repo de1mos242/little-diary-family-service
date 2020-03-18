@@ -8,17 +8,17 @@ class BabySchema(Schema):
 
 
 class FamilyMemberSchema(Schema):
-    id = fields.Int(dump_only=True)
+    member_uuid = fields.UUID(dump_only=True, data_key='uuid')
     user_uuid = fields.UUID(dump_only=True)
 
 
 class FamilySchema(Schema):
-    id = fields.Int(dump_only=True)
+    family_uuid = fields.UUID(dump_only=True, data_key='uuid')
     title = fields.Str(required=True, allow_none=False)
 
     babies = fields.Nested(BabySchema, many=True, dump_only=True)
     members = fields.Nested(FamilyMemberSchema, many=True, dump_only=True)
 
 
-class TokenSchema(Schema):
+class InvitationTokenSchema(Schema):
     token = fields.Str(required=True, allow_none=False)

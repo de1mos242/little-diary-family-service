@@ -48,6 +48,7 @@ register(IssuedTokenFactory)
 
 @pytest.fixture
 async def app():
+    # pylint: disable=redefined-outer-name
     app = await init_app()
     exclude_tables = ["alembic_version"]
 
@@ -64,6 +65,7 @@ async def app():
 
 
 @pytest.fixture
+# pylint: disable=redefined-outer-name
 async def cli(app, aiohttp_client):
     return await aiohttp_client(app)
 
@@ -83,7 +85,8 @@ def make_headers():
 
 
 @pytest.fixture
-async def add_default_family_with_member(app: web.Application, family_factory, family_member_factory):
+# pylint: disable=redefined-outer-name
+async def default_family_with_member(app: web.Application, family_factory, family_member_factory):
     user_uuid = str(uuid4())
     async with app['db'].acquire() as conn:
         family = family_factory.create()
