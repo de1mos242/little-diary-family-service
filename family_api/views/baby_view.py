@@ -2,6 +2,7 @@ from aiohttp import web
 from aiohttp_apispec import docs, request_schema, response_schema
 
 from family_api.controllers.baby import create_or_update_baby_fields, remove_baby
+from family_api.decorators import is_current_user_in_family
 from family_api.schemas import BabySchema
 
 
@@ -9,6 +10,7 @@ class BabyView(web.View):
     @docs(summary="Create of update baby info")
     @request_schema(BabySchema())
     @response_schema(BabySchema())
+    @is_current_user_in_family
     async def put(self):
         schema = BabySchema()
         family_uuid = self.request.match_info['family_uuid']
@@ -20,6 +22,7 @@ class BabyView(web.View):
 
     @docs(summary="Delete baby",
           responses={204: "Successfully deleted"})
+    @is_current_user_in_family
     async def delete(self):
         family_uuid = self.request.match_info['family_uuid']
         baby_uuid = self.request.match_info['baby_uuid']

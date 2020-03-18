@@ -22,3 +22,7 @@ class FamilySchema(Schema):
 
 class InvitationTokenSchema(Schema):
     token = fields.Str(required=True, allow_none=False)
+
+
+class AccessPermissionSchema(Schema):
+    has_access = fields.Bool(required=True, allow_none=False)
