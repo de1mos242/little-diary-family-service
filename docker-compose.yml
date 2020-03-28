@@ -21,3 +21,21 @@ services:
     logging:
       options:
         max-size: 500m
+  web:
+    image: family_api
+    build: .
+    command: gunicorn -b 0.0.0.0:5000 family_api.main:init_app --worker-class aiohttp.GunicornWebWorker
+    env_file:
+      - .env
+    environment:
+      DATABASE_URI: "postgres://postgres:qwerty@db:5432/family_db"
+    volumes:
+      - ./family_api:/code/family_api
+      - ./migrations:/code/migrations
+    ports:
+      - "42002:5000"
+    logging:
+      options:
+        max-size: 500m
+    depends_on:
+      - db
