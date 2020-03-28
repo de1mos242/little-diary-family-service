@@ -85,6 +85,20 @@ def make_headers():
 
 
 @pytest.fixture
+def make_tech_headers():
+    def _make_tech_headers(uuid: UUID):
+        token = jwt.encode({"user_claims": {"role": "tech", "uuid": str(uuid), "resources": ["family_read"]}},
+                           key=TEST_JWT_PRIVATE_KEY,
+                           algorithm="RS256")
+        return {
+            'content-type': 'application/json',
+            'authorization': f'Bearer {token.decode("utf-8")}'
+        }
+
+    return _make_tech_headers
+
+
+@pytest.fixture
 # pylint: disable=redefined-outer-name
 async def default_family_with_member(app: web.Application, family_factory, family_member_factory):
     user_uuid = str(uuid4())

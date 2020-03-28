@@ -2,6 +2,7 @@ from aiohttp import web
 from aiohttp_apispec import request_schema, docs, response_schema
 
 from family_api.controllers.family_member import accept_member_invitation, issue_invitation_token, remove_family_member
+from family_api.decorators import is_current_user_in_family
 from family_api.schemas import InvitationTokenSchema
 
 
@@ -22,6 +23,7 @@ class FamilyMemberListView(web.View):
 class FamilyMemberTokenView(web.View):
     @docs(summary="Issue new invitation token")
     @response_schema(InvitationTokenSchema())
+    @is_current_user_in_family
     async def post(self):
         schema = InvitationTokenSchema()
         family_uuid = self.request.match_info['family_uuid']
@@ -33,6 +35,7 @@ class FamilyMemberTokenView(web.View):
 class FamilyMemberView(web.View):
     @docs(summary="Remove family member",
           responses={204: "Successfully deleted"})
+    @is_current_user_in_family
     async def delete(self):
         family_uuid = self.request.match_info['family_uuid']
         member_uuid = self.request.match_info['member_uuid']

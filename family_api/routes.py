@@ -1,3 +1,4 @@
+from family_api.views.baby_access_view import BabyAccessView
 from family_api.views.baby_view import BabyView
 from family_api.views.family_member_view import FamilyMemberListView, FamilyMemberTokenView, FamilyMemberView
 from family_api.views.family_view import FamilyView
@@ -11,3 +12,4 @@ def setup_routes(app):
     app.router.add_view(f'/v1/family/{{family_uuid:{uuid_regexp}}}/member/{{member_uuid:{uuid_regexp}}}',
                         FamilyMemberView)
     app.router.add_view(f'/v1/family/{{family_uuid:{uuid_regexp}}}/baby/{{baby_uuid:{uuid_regexp}}}', BabyView)
+    app.router.add_view(f'/v1/access/{{user_uuid:{uuid_regexp}}}/baby/{{baby_uuid:{uuid_regexp}}}', BabyAccessView)

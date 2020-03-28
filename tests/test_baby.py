@@ -16,6 +16,11 @@ async def test_create_baby(app: web.Application, cli: TestClient, make_headers,
 
     resp = await cli.put(f"/v1/family/{family['family_uuid']}/baby/{baby_uuid}",
                          data=json.dumps(data),
+                         headers=make_headers(uuid4()))
+    assert resp.status == 403, await resp.text()
+
+    resp = await cli.put(f"/v1/family/{family['family_uuid']}/baby/{baby_uuid}",
+                         data=json.dumps(data),
                          headers=make_headers(user_uuid))
     assert resp.status == 201, await resp.text()
     response = await resp.json()
@@ -42,6 +47,11 @@ async def test_update_baby(app: web.Application, cli: TestClient, make_headers, 
 
     data = {"first_name": "Adam",
             "date_of_birth": "2018-01-01"}
+
+    resp = await cli.put(f"/v1/family/{family['family_uuid']}/baby/{baby['baby_uuid']}",
+                         data=json.dumps(data),
+                         headers=make_headers(uuid4()))
+    assert resp.status == 403, await resp.text()
 
     resp = await cli.put(f"/v1/family/{family['family_uuid']}/baby/{baby['baby_uuid']}",
                          data=json.dumps(data),
