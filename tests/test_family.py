@@ -20,7 +20,11 @@ async def test_create_family(app: web.Application, cli: TestClient, make_headers
 
     async with app['db'].acquire() as conn:
         stored_family = await family_repository.get_by_uuid(str(family_uuid), conn)
-    assert stored_family is not None
+        assert stored_family is not None
+        family_members = await family_member_repository.find_by_family_id(stored_family.id, conn)
+        assert len(family_members) == 1
+        assert family_members[0]['user_uuid'] == str(user_uuid)
+
     assert stored_family.title == "My super family"
 
 

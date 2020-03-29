@@ -21,6 +21,16 @@ services:
     logging:
       options:
         max-size: 500m
+  migration:
+    image: family_api
+    build: .
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; cd migrations; `PYTHONPATH=.. alembic upgrade head`'
+    env_file:
+      - .env
+    environment:
+      DATABASE_URI: "postgres://postgres:qwerty@db:5432/family_db"
+    depends_on:
+      - db
   web:
     image: family_api
     build: .
@@ -38,4 +48,4 @@ services:
       options:
         max-size: 500m
     depends_on:
-      - db
+      - migration
