@@ -6,12 +6,6 @@ from aiohttp.web_exceptions import HTTPNotFound, HTTPForbidden, HTTPBadRequest
 from family_api.config import Config
 from family_api.enums import TokenType
 from family_api.repositories import family_repository, issued_token_repository, family_member_repository
-from family_api.repositories.family_member_repository import insert_family_member
-
-
-async def add_family_member(family_obj, user_uuid: UUID, conn):
-    family_member_obj = dict(family_id=family_obj.id, user_uuid=str(user_uuid))
-    await insert_family_member(family_member_obj, conn)
 
 
 async def accept_member_invitation(family_uuid, token, user_uuid: UUID, conn):

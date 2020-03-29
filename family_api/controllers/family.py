@@ -1,4 +1,4 @@
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from aiohttp.web_exceptions import HTTPNotFound
 
@@ -22,14 +22,16 @@ async def get_family_info(family_uuid: int, conn):
     return family
 
 
-async def create_or_update_family(family_uuid: UUID, family_data: dict, conn):
+async def create_or_update_family(family_uuid: UUID, family_data: dict, user_uuid: UUID, conn):
     family = await family_repository.get_by_uuid(family_uuid, conn)
     if family:
         await family_repository.update_family(family.id, family_data, conn)
         created = False
     else:
         family_data['family_uuid'] = family_uuid
-        await family_repository.insert_family(family_data, conn)
+        family_id = await family_repository.insert_family(family_data, conn)
+        family_member_obj = dict(family_id=family_id, user_uuid=str(user_uuid), member_uuid=str(uuid4()))
+        await family_member_repository.insert_family_member(family_member_obj, conn)
         created = True
     return await family_repository.get_by_uuid(family_uuid, conn), created
 
