@@ -20,6 +20,10 @@ class FamilySchema(Schema):
     members = fields.Nested(FamilyMemberSchema, many=True, dump_only=True)
 
 
+class FamiliesSchema(Schema):
+    families = fields.Nested(FamilySchema, many=True, dump_only=True, exclude={'babies', 'members'})
+
+
 class InvitationTokenSchema(Schema):
     token = fields.Str(required=True, allow_none=False)
 

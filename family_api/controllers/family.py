@@ -1,3 +1,4 @@
+from typing import List
 from uuid import UUID, uuid4
 
 from aiohttp.web_exceptions import HTTPNotFound
@@ -40,8 +41,12 @@ async def update_family(family_id: int, family_data, conn):
     return await family_repository.update_family(family_id, family_data, conn)
 
 
-async def delete_family(family_uuid: int, conn):
+async def delete_family(family_uuid: UUID, conn):
     family = await get_by_uuid(family_uuid, conn)
     if not family:
         raise HTTPNotFound()
     return await family_repository.delete_family(family.id, conn)
+
+
+async def get_families_for_user(user_uuid: UUID, conn) -> List[dict]:
+    return await family_repository.get_by_family_member(user_uuid, conn)
