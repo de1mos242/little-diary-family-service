@@ -13,7 +13,7 @@ SECURITY_WHITELIST = ['/swagger-ui', '/static*', '/api/docs*']
 
 
 async def create_db_connection():
-    return await create_engine(Config.DATABASE_URI)
+    return await create_engine(Config.DATABASE_URI, echo=True)
 
 
 def create_jwt_middleware():

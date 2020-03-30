@@ -2,9 +2,9 @@ from aiohttp import web
 from aiohttp_apispec import docs, request_schema, response_schema
 
 from family_api.controllers.family import get_family_info, delete_family, \
-    create_or_update_family
+    create_or_update_family, get_families_for_user
 from family_api.decorators import is_current_user_in_family_or_new, is_current_user_in_family
-from family_api.schemas import FamilySchema
+from family_api.schemas import FamilySchema, FamiliesSchema
 
 
 class FamilyView(web.View):
@@ -41,3 +41,15 @@ class FamilyView(web.View):
         async with self.request.app['db'].acquire() as conn:
             await delete_family(family_uuid, conn)
         return web.Response(status=204)
+
+
+class FamilyListView(web.View):
+
+    @docs(summary="Get list of families for user")
+    @response_schema(FamiliesSchema())
+    async def get(self):
+        user_uuid = self.request['token_data']['user_claims']['uuid']
+        schema = FamiliesSchema()
+        async with self.request.app['db'].acquire() as conn:
+            stored_families = await get_families_for_user(user_uuid, conn)
+        return web.json_response(schema.dump(dict(families=stored_families)))

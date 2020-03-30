@@ -28,6 +28,29 @@ async def test_create_family(app: web.Application, cli: TestClient, make_headers
     assert stored_family.title == "My super family"
 
 
+async def test_get_user_families(app: web.Application, cli: TestClient, make_headers, family_factory,
+                                 family_member_factory):
+    user_uuid = str(uuid4())
+    async with app['db'].acquire() as conn:
+        families = family_factory.create_batch(4)
+        for family in families:
+            family['id'] = await family_repository.insert_family(family, conn)
+            family_member = family_member_factory.create(family_id=family['id'], user_uuid=user_uuid)
+            family_member['id'] = await family_member_repository.insert_family_member(family_member, conn)
+
+        another_family = family_factory.create()
+        another_family['id'] = await family_repository.insert_family(another_family, conn)
+        another_member = family_member_factory.create(family_id=another_family['id'])
+        another_member['id'] = await family_member_repository.insert_family_member(another_member, conn)
+
+    resp = await cli.get("/v1/family", headers=make_headers(user_uuid))
+    assert resp.status == 200, await resp.text()
+
+    response = await resp.json()
+    assert len(response['families']) == 4
+    assert {f['uuid'] for f in response['families']} == {f["family_uuid"] for f in families}
+
+
 # pylint: disable=too-many-arguments
 async def test_get_family_info(app: web.Application, cli: TestClient, make_headers, family_factory,
                                family_member_factory, baby_factory):
