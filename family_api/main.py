@@ -3,6 +3,7 @@ import asyncio
 from aiohttp import web
 from aiohttp_apispec import setup_aiohttp_apispec
 from aiohttp_jwt import JWTMiddleware
+from aiohttp_middlewares import cors_middleware
 from aiopg.sa import create_engine
 
 from family_api.config import Config
@@ -27,11 +28,17 @@ def create_current_user_middleware():
     return get_current_user_middleware(SECURITY_WHITELIST)
 
 
+def create_cors_middleware():
+    return cors_middleware(allow_all=True)
+
+
 async def init_app():
     jwt_middleware = create_jwt_middleware()
     current_user_middleware = create_current_user_middleware()
-    app = web.Application(middlewares=[jwt_middleware, current_user_middleware])
+    cors_middleware = create_cors_middleware()
+    app = web.Application(middlewares=[cors_middleware, jwt_middleware, current_user_middleware])
     setup_routes(app)
+
     setup_aiohttp_apispec(app=app, title="Family service", version="v1", swagger_path='/swagger-ui',
                           securityDefinitions={"jwt": {"type": "apiKey",
                                                        "schema": "bearer",
