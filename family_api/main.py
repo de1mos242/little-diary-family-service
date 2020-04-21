@@ -10,7 +10,7 @@ from family_api.config import Config
 from family_api.middlewares import get_current_user_middleware
 from family_api.routes import setup_routes
 
-SECURITY_WHITELIST = ['/swagger-ui', '/static*', '/api/docs*']
+SECURITY_WHITELIST = ['/swagger-ui', '/static*', '/api/docs*', '/status*']
 
 
 async def create_db_connection():
