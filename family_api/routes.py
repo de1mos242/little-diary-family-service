@@ -2,10 +2,14 @@ from family_api.views.baby_access_view import BabyAccessView
 from family_api.views.baby_view import BabyView
 from family_api.views.family_member_view import FamilyMemberListView, FamilyMemberTokenView, FamilyMemberView
 from family_api.views.family_view import FamilyView, FamilyListView
+from family_api.views.status_view import HealthView
 
 
 def setup_routes(app):
     uuid_regexp = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+
+    app.router.add_view("/status/health", HealthView)
+
     app.router.add_view(f'/v1/family', FamilyListView)
     app.router.add_view(f'/v1/family/{{family_uuid:{uuid_regexp}}}', FamilyView)
     app.router.add_view(f'/v1/family/{{family_uuid:{uuid_regexp}}}/member', FamilyMemberListView)
