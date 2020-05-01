@@ -8,11 +8,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    with:
-      fetch-depth: '0'
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: '0'
     - name: Build base image
       run: docker build -t 'family-service-base-img' .
     - name: Run linters
